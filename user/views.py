@@ -4,7 +4,8 @@ from .serializers import RegistrationSerializer, LoginSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .utils import JWT, TokenRole, send_email, verify_token
+from .utils import JWT, TokenRole, verify_token
+from events import ee
 import logging
 
 logging.basicConfig(filename='book_store.log', encoding='utf-8', level=logging.DEBUG,
@@ -23,7 +24,8 @@ class UserRegistration(APIView):
             serializer.save()
             token = JWT.encode({'user_id': serializer.data.get('id'), 'username': serializer.data.get('username'),
                                 'role': TokenRole.verify_user.value})
-            send_email({'token': token, 'recipient': serializer.data.get('email'), 'role': TokenRole.verify_user.value})
+            ee.emit('send_mail', {'token': token, 'recipient': serializer.data.get('email'),
+                                  'role': TokenRole.verify_user.value})
             return Response({'message': 'User Created', 'status': 201, 'data': serializer.data},
                             status=status.HTTP_201_CREATED)
         except Exception as ex:
@@ -102,7 +104,7 @@ class ForgotPassword(APIView):
             if not user:
                 raise Exception('Invalid username or email')
             token = JWT.encode({'user_id': user.id, 'username': user.username, 'role': TokenRole.forgot_password.value})
-            send_email({'token': token, 'recipient': user.email, 'role': TokenRole.forgot_password.value})
+            ee.emit('send_mail', {'token': token, 'recipient': user.email, 'role': TokenRole.forgot_password.value})
             return Response({'message': 'Password reset link sent to your mail', 'status': 200, 'data': {}},
                             status=status.HTTP_200_OK)
         except Exception as ex:

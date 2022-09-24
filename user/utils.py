@@ -2,8 +2,6 @@ import jwt
 from enum import Enum
 from django.conf import settings
 import logging
-from django.core.mail import send_mail
-from rest_framework.reverse import reverse
 
 logging.basicConfig(filename='book_store.log', encoding='utf-8', level=logging.DEBUG,
                     format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
@@ -42,23 +40,6 @@ class JWT:
             raise Exception("Invalid Token")
         except Exception as ex:
             logger.exception(ex)
-
-
-def send_email(payload):
-    try:
-        subject, link = '', ''
-        if payload.get('role') == TokenRole.verify_user.value:
-            subject = 'Book Store Registration'
-            link = settings.BASE_URL + reverse('verify_user', kwargs={'token': payload.get('token')})
-        if payload.get('role') == TokenRole.forgot_password.value:
-            subject = 'Reset Password Link'
-            link = settings.BASE_URL + reverse('verify_password', kwargs={'token': payload.get('token')})
-        send_mail(subject=subject,
-                  message=f'Link will get expired after one hour of generation\n' + link,
-                  from_email=None,
-                  recipient_list=[payload.get('recipient')])
-    except Exception as ex:
-        logger.exception(ex)
 
 
 def verify_token(function):

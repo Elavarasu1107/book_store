@@ -16,6 +16,9 @@ class OrderApi(APIView):
 
     @verify_token
     def post(self, request):
+        """
+        Place the order for the given cart id
+        """
         try:
             serializer = OrderSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -28,6 +31,9 @@ class OrderApi(APIView):
 
     @verify_token
     def get(self, request):
+        """
+        Retrieves the order data from the database
+        """
         try:
             orders = Order.objects.filter(user=request.data.get('user'))
             serializer = GetSerializer(orders, many=True)
@@ -39,6 +45,9 @@ class OrderApi(APIView):
 
     @verify_token
     def delete(self, request):
+        """
+        Cancels the order
+        """
         try:
             order = Order.objects.get(id=request.data.get('id'), user_id=request.data.get('user'))
             order.delete()

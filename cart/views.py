@@ -16,6 +16,9 @@ class CartApi(APIView):
 
     @verify_token
     def post(self, request):
+        """
+        Adds the book to the cart
+        """
         try:
             serializer = CartSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -28,6 +31,9 @@ class CartApi(APIView):
 
     @verify_token
     def get(self, request):
+        """
+        Retrieves the cart data from the database
+        """
         try:
             items = Cart.objects.filter(user=request.data.get('user'))
             serializer = CartSerializer(items, many=True)
@@ -39,6 +45,9 @@ class CartApi(APIView):
 
     @verify_token
     def put(self, request):
+        """
+        Updates the quantity of books in the cart
+        """
         try:
             cart = Cart.objects.get(id=request.data.get('cart'))
             serializer = CartSerializer(cart, data=request.data)
@@ -52,6 +61,9 @@ class CartApi(APIView):
 
     @verify_token
     def delete(self, request):
+        """
+        Deletes the cart
+        """
         try:
             cart = Cart.objects.get(id=request.data.get('id'), user_id=request.data.get('user'))
             cart.delete()

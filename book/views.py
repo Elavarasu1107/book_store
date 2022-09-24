@@ -16,6 +16,9 @@ class BooksApi(APIView):
 
     @verify_token
     def post(self, request):
+        """
+        Adds book to the database
+        """
         try:
             serializer = BookSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -28,6 +31,9 @@ class BooksApi(APIView):
 
     @verify_token
     def get(self, request):
+        """
+        Retrieves the book from the database
+        """
         try:
             books = Book.objects.filter(user_id=request.data.get('user'))
             serializer = BookSerializer(books, many=True)
@@ -39,6 +45,9 @@ class BooksApi(APIView):
 
     @verify_token
     def put(self, request):
+        """
+        Updates the book data in the database
+        """
         try:
             book = Book.objects.get(id=request.data.get('id'), user_id=request.data.get('user'))
             serializer = BookSerializer(book, data=request.data)
@@ -52,6 +61,9 @@ class BooksApi(APIView):
 
     @verify_token
     def delete(self, request):
+        """
+        Deletes the book from the database
+        """
         try:
             book = Book.objects.get(id=request.data.get('id'), user_id=request.data.get('user'))
             book.delete()
